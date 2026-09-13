@@ -11,29 +11,29 @@ struct vertex {
     vertex *right;
 } *root;
 
-void PrintMas(int *A, int n);
-void BubbleSort(int *A, int n);
+void print_mas(int *A, int n);
+void bubble_sort(int *A, int n);
 void obhod_left_to_right(vertex *p);
 int size_tree(vertex *p);
 int sum_tree(vertex *p);
 int height_tree(vertex *p);
 int sum_len_way(vertex *p, int l);
 vertex *ISPD(int L, int R, int *A);
-void FillRand(int *A, int n);
+void fill_rand(int *A, int n);
 
 int main(int argc, char const *argv[]) {
     int *A = NULL;
     int n = 100;
     A = (int *)malloc(n * sizeof(int));
     srand(time(0));
-    FillRand(A, 100);
+    fill_rand(A, 100);
     printf("\n");
     printf("Исходный массив: ");
-    PrintMas(A, 100);
+    print_mas(A, 100);
     printf("\n");
-    BubbleSort(A, 100);
+    bubble_sort(A, 100);
     printf("Отсортированный массив: ");
-    PrintMas(A, 100);
+    print_mas(A, 100);
     printf("\n");
     root = ISPD(0, 99, A);
     printf("Обход слеав направо: ");
@@ -105,19 +105,19 @@ vertex *ISPD(int L, int R, int *A) {
         return p;
     }
 }
-void FillRand(int *A, int n) {
+void fill_rand(int *A, int n) {
     srand(time(0));
     for (int i = 0; i < n; i++) {
         A[i] = rand() % (2 * n + 1);
     }
 }
-void PrintMas(int *A, int n) {
+void print_mas(int *A, int n) {
     for (int i = 0; i < n; i++) {
         printf("%d ", A[i]);
     }
     printf("\n");
 }
-void BubbleSort(int *A, int n) {
+void bubble_sort(int *A, int n) {
     for (int i = 0; i < n; i++) {
         for (int j = n - 1; j > i; j--) {
             if (A[j] < A[j - 1]) {
