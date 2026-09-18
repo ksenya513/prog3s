@@ -52,6 +52,8 @@ void draw_tree_top_down(sf::RenderWindow &window, vertex *p, float x, float y, f
                              sf::Vertex(sf::Vector2f(x + x_lenght + 5, y + y_step), sf::Color(255, 150, 0))};
         window.draw(line, 4, sf::PrimitiveType::Lines);
     }
+    draw_tree_top_down(window, p->left, x - x_lenght, y + y_step, x_lenght / 2, font);
+    draw_tree_top_down(window, p->right, x + x_lenght, y + y_step, x_lenght / 2, font);
     sf::CircleShape krug(radius);
     krug.setFillColor(sf::Color(200, 150, 90));
     krug.setOutlineThickness(2.0f);
@@ -62,8 +64,6 @@ void draw_tree_top_down(sf::RenderWindow &window, vertex *p, float x, float y, f
     text.setPosition(sf::Vector2f(x - 2, y + 5));
     window.draw(krug);
     window.draw(text);
-    draw_tree_top_down(window, p->left, x - x_lenght, y + y_step, x_lenght / 2, font);
-    draw_tree_top_down(window, p->right, x + x_lenght, y + y_step, x_lenght / 2, font);
 }
 
 int main(int argc, char const *argv[]) {
@@ -85,7 +85,7 @@ int main(int argc, char const *argv[]) {
             }
         }
         window.clear(sf::Color(219, 215, 210));
-        if (root != nullptr) {
+        if (root != NULL) {
             // центр(600,50) и сдвигом 400
             draw_tree_top_down(window, root, 950.0f, 50.0f, 480.0f, font);
         }
@@ -95,7 +95,7 @@ int main(int argc, char const *argv[]) {
 }
 
 void obhod_top_to_bottom(vertex *p) {
-    if (p != nullptr) {
+    if (p != NULL) {
         printf(" %d ", p->data);
         obhod_top_to_bottom(p->left);
         obhod_top_to_bottom(p->right);
