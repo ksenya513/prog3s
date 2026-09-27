@@ -137,7 +137,7 @@ vertex *ISPD(int L, int R, int *A) {
 void fill_rand(int *A, int n) {
     srand(time(0));
     for (int i = 0; i < n; i++) {
-        A[i] = rand() % (2 * n + 1);
+        A[i] = rand() % (80 * n + 1);
     }
 }
 void print_mas(int *A, int n) {
