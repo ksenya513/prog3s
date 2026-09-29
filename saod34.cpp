@@ -14,14 +14,14 @@ struct vertex {
 
 void print_mas(int *A, int n);
 void obhod_left_to_right(vertex *p);
-void obhod_top_to_bottom(vertex *p);
-void SDP_double_cos(int D, vertex *&root);
 int size_tree(vertex *p);
 int sum_tree(vertex *p);
 int height_tree(vertex *p);
 int sum_len_way(vertex *p, int l);
-vertex *ISPD(int L, int R, int *A);
+void SDP_recursion(int D, vertex *&p);
 void fill_rand(int *A, int n);
+char *get_tree_name(int t);
+void delete_SDP(int D, vertex *&root);
 
 void draw_tree_top_down(sf::RenderWindow &window, vertex *p, float x, float y, float x_lenght, const sf::Font &font) {
     if (p == NULL)
@@ -67,14 +67,26 @@ void draw_tree_top_down(sf::RenderWindow &window, vertex *p, float x, float y, f
 
 int main(int argc, char const *argv[]) {
     int *A = NULL;
-    int n = 100;
+    int n = 20;
     A = (int *)malloc(n * sizeof(int));
+    int size;
+    int sum;
+    int height;
+    int slw;
+    int t;
     srand(time(0));
-    fill_rand(A, 100);
-    for (int i = 0; i < 100; i++) {
-        SDP_double_cos(A[i], root);
+    fill_rand(A, 20);
+    printf("\n");
+    printf("Исходный массив: ");
+    print_mas(A, 20);
+    printf("\n");
+    for (int i = 0; i < 20; i++) {
+        SDP_recursion(A[i], root);
     }
-    sf::RenderWindow window(sf::VideoMode({1800, 1000}), "Derevo");
+    printf("обход слева направо: \n");
+    obhod_left_to_right(root);
+    printf("\n\n");
+    sf::RenderWindow window(sf::VideoMode({1800, 750}), "Derevo");
     window.setFramerateLimit(60);
     sf::Font font;
     font.openFromFile("C:\\Windows\\Fonts\\arial.ttf");
@@ -89,69 +101,122 @@ int main(int argc, char const *argv[]) {
             draw_tree_top_down(window, root, 950.0f, 50.0f, 480.0f, font);
         }
         window.display();
+        printf("Введите вершину, которую необходимо удалить\n");
+        scanf("%d", &t);
+        delete_SDP(t, root);
     }
+
     return 0;
 }
-
-void obhod_top_to_bottom(vertex *p) {
-    if (p != NULL) {
-        printf(" %d ", p->data);
-        obhod_top_to_bottom(p->left);
-        obhod_top_to_bottom(p->right);
-    } else {
-        printf("_ ");
-    }
-}
-
 void obhod_left_to_right(vertex *p) {
-    if (p != nullptr) {
+    if (p != NULL) {
         obhod_left_to_right(p->left);
-        printf("%d ", p->data);
+        printf(" %d ", p->data);
         obhod_left_to_right(p->right);
     }
 }
-vertex *ISPD(int L, int R, int *A) {
-    if (L > R)
-        return nullptr;
-    else {
-        int m = (L + R) / 2;
-        vertex *p = (vertex *)malloc(sizeof(vertex));
-        p->data = A[m];
-        p->left = ISPD(L, m - 1, A);
-        p->right = ISPD(m + 1, R, A);
-        return p;
+
+int size_tree(vertex *p) {
+    int n;
+    if (p == NULL) {
+        n = 0;
+    } else {
+        n = 1 + size_tree(p->left) + size_tree(p->right);
     }
+    return n;
+}
+int sum_tree(vertex *p) {
+    int s;
+    if (p == NULL) {
+        s = 0;
+    } else {
+        s = p->data + sum_tree(p->left) + sum_tree(p->right);
+    }
+    return s;
+}
+int height_tree(vertex *p) {
+    int h;
+    if (p == NULL) {
+        h = 0;
+    } else {
+        h = 1 + std::max(height_tree(p->left), height_tree(p->right));
+    }
+    return h;
+}
+int sum_len_way(vertex *p, int l) {
+    int s;
+    if (p == NULL) {
+        s = 0;
+    } else {
+        s = l + sum_len_way(p->left, l + 1) + sum_len_way(p->right, l + 1);
+    }
+    return s;
 }
 
 void fill_rand(int *A, int n) {
+    srand(time(0));
     for (int i = 0; i < n; i++) {
-        A[i] = rand() % (2 * n + 1);
+        A[i] = rand() % 80;
     }
 }
-
 void print_mas(int *A, int n) {
     for (int i = 0; i < n; i++) {
         printf("%d ", A[i]);
     }
     printf("\n");
 }
-void SDP_double_cos(int D, vertex *&root) {
+
+void SDP_recursion(int D, vertex *&p) {
+    if (p == NULL) {
+        p = new (vertex);
+        p->data = D;
+        p->left = NULL;
+        p->right = NULL;
+    } else if (D < p->data)
+        SDP_recursion(D, p->left);
+    else if (D > p->data)
+        SDP_recursion(D, p->right);
+    else {
+        return;
+    }
+}
+void delete_SDP(int D, vertex *&root) {
     vertex **p = &root;
+    vertex *q;
+    vertex *r;
+    vertex *s;
     while (*p != NULL) {
-        if (D < (*p)->data)
+        if (D < (*p)->data) {
             p = &((*p)->left);
-        else if (D > (*p)->data)
+        } else if (D > (*p)->data) {
             p = &((*p)->right);
-        else {
+        } else {
             break;
         }
     }
-    if (*p == NULL) {
-        *p = new vertex;
-        (*p)->data = D;
-        (*p)->left = NULL;
-        (*p)->right = NULL;
+    if (*p != NULL) {
+        q = *p;
+        if (q->left == NULL) {
+            *p = q->right;
+        } else if (q->right == NULL) {
+            *p = q->left;
+        } else {
+            r = q->left;
+            s = q;
+            if (r->right == NULL) {
+                r->right = q->right;
+            } else {
+                while (r->right != NULL) {
+                    s = r;
+                    r = r->right;
+                }
+                s->right = r->left;
+                r->left = q->left;
+                r->right = q->right;
+                *p = r;
+            }
+        }
     }
+    delete (q);
 }
-
-// g++ grafic.cpp -lsfml-graphics -lsfml-window -lsfml-system -o fzar.exe
+// g++ saod34.cpp -lsfml-graphics -lsfml-window -lsfml-system -o fzar.exe
