@@ -9,9 +9,9 @@ void print_rand_matrix(int **matrix, int size);
 int **gen_N_matrix(int size, int maxValue);
 void print_D(int *D, int size);
 
-void right_diaginal(int **matrix, int *D, int size);
-void left_diaginal(int **matrix, int *D, int size);
-void spiral_center(int **matrix, int *D, int size);
+void rightDiagonals(int **matrix, int *arr, int size);
+void leftDiagonals(int **matrix, int *arr, int size);
+void spiralFromCenter(int **matrix, int size, int *arr);
 void spiral_start(int **matrix, int *D, int size);
 
 int main() {
@@ -22,25 +22,25 @@ int main() {
     int double_size = size * size;
 
     int **matrix = gen_N_matrix(size, max);
-    printf("–ò—Å—Ö–æ–¥–Ω–∞—è –º–∞—Ç—Ä–∏—Ü–∞ %dx%d:\n", size, size);
+    printf("à·ÂÆ§≠†Ô ¨†‚‡®Ê† %dx%d:\n", size, size);
     print_N_matrix(matrix, size);
 
     int D[double_size];
 
-    right_diaginal(matrix, D, size);
-    printf("\n–ü –ø—Ä–∞–≤—ã–º –¥–∏–∞–≥–æ–Ω–∞–ª—è–º: ");
+    rightDiagonals(matrix, D, size);
+    printf("\nèÆ Ø‡†¢Î¨ §®†£Æ≠†´Ô¨: ");
     print_D(D, double_size);
 
-    left_diaginal(matrix, D, size);
-    printf("–ü–æ –ª–µ–≤—ã–º –¥–∏–∞–≥–æ–Ω–∞–ª—è–º: ");
+    leftDiagonals(matrix, D, size);
+    printf("èÆ ´≠¢Î¨ §®†£Æ≠†´Ô¨: ");
     print_D(D, double_size);
 
-    spiral_center(matrix, D, size);
-    printf("–ü–æ —Å–ø–∏—Ä–∞–ª–∏ –æ—Ç —Ü–µ–Ω—Ç—Ä–∞: ");
+    spiralFromCenter(matrix, size, D);
+    printf("èÆ ·Ø®‡†´® Æ‚ Ê•≠‚‡†: ");
     print_D(D, double_size);
 
     spiral_start(matrix, D, size);
-    printf("–ü–æ —Å–ø–∏—Ä–∞–ª–∏ —Å 1 —ç–ª–µ–º–µ–Ω—Ç–∞: ");
+    printf("èé ·Ø®‡†´® · 1 Ì´•¨•≠‚†: ");
     print_D(D, double_size);
 
     for (int i = 0; i < size; i++) {
@@ -104,7 +104,6 @@ void print_N_matrix(int **matrix, int size) {
 void print_rand_matrix(int **matrix, int size) {
     for (int i = 0; i < size; i++) {
         int len = matrix[i][0];
-        printf("Stroka %d (%d el): ", i + 1, len);
         for (int j = 1; j <= len; j++) {
             printf("%3d ", matrix[i][j]);
         }
@@ -112,99 +111,66 @@ void print_rand_matrix(int **matrix, int size) {
     }
 }
 
-void right_diaginal(int **matrix, int *D, int size) {
-    int k = 0;
-    for (int start_c = size - 1; start_c >= 0; start_c--) {
-        int r = 0;
-        int c = start_c;
-        while (r < size && c >= 0) {
-            D[k] = matrix[r][c];
-            k = k + 1;
-            r = r + 1;
-            c = c - 1;
+void rightDiagonals(int **matrix, int *arr, int size) {
+    int c = 0;
+    for (int k = size - 1; k >= 0; k--) {
+        int i = 0, j = k;
+        while (i < size && j < size) {
+            arr[c++] = matrix[i][j];
+            i++;
+            j++;
         }
     }
-
-    for (int start_r = 1; start_r < size; start_r++) {
-        int r = start_r;
-        int c = size - 1;
-        while (r < size && c >= 0) {
-            D[k] = matrix[r][c];
-            k = k + 1;
-            r = r + 1;
-            c = c - 1;
+    for (int k = 1; k < size; k++) {
+        int i = k, j = 0;
+        while (i < size && j < size) {
+            arr[c++] = matrix[i][j];
+            i++;
+            j++;
         }
     }
 }
 
-void left_diaginal(int **matrix, int *D, int size) {
-    int k = 0;
-    for (int start_c = size - 1; start_c >= 0; start_c--) {
-        int r = 0;
-        int c = start_c;
-        while (r < size && c < size) {
-            D[k] = matrix[r][c];
-            k = k + 1;
-            r = r + 1;
-            c = c + 1;
+void leftDiagonals(int **matrix, int *arr, int size) {
+    int c = 0;
+    for (int k = 0; k < size; k++) {
+        int i = 0, j = k;
+        while (i < size && j >= 0) {
+            arr[c++] = matrix[i][j];
+            i++;
+            j--;
         }
     }
-
-    for (int start_r = 1; start_r < size; start_r++) {
-        int r = start_r;
-        int c = 0;
-        while (r < size && c < size) {
-            D[k] = matrix[r][c];
-            k = k + 1;
-            r = r + 1;
-            c = c + 1;
+    for (int k = 1; k < size; k++) {
+        int i = k, j = size - 1;
+        while (i < size && j >= 0) {
+            arr[c++] = matrix[i][j];
+            i++;
+            j--;
         }
     }
 }
-void spiral_center(int **matrix, int *D, int size) {
-    int k = 0;
-    int r = size / 2;
-    int c = size / 2;
+void spiralFromCenter(int **matrix, int size, int *arr) {
+    int c = 0;
+    int r = (size - 1) / 2;
+    int col = (size - 1) / 2;
 
-    D[k] = matrix[r][c];
-    k++;
+    arr[c++] = matrix[r][col];
 
     int step = 1;
-    while (k < size * size) {
-        // –í–ø—Ä–∞–≤–æ
-        for (int i = 0; i < step; i++) {
-            c = c + 1;
-            if (r >= 0 && r < size && c >= 0 && c < size) {
-                D[k] = matrix[r][c];
-                k++;
-            }
-        }
-        // –í–Ω–∏–∑
-        for (int i = 0; i < step; i++) {
-            r = r + 1;
-            if (r >= 0 && r < size && c >= 0 && c < size) {
-                D[k] = matrix[r][c];
-                k++;
-            }
-        }
-        step = step + 1;
+    while (c < size * size) {
+        for (int i = 0; i < step && c < size * size; i++)
+            arr[c++] = matrix[r][++col];
+        for (int i = 0; i < step && c < size * size; i++)
+            arr[c++] = matrix[++r][col];
 
-        // –í–ª–µ–≤–æ
-        for (int i = 0; i < step; i++) {
-            c = c - 1;
-            if (r >= 0 && r < size && c >= 0 && c < size) {
-                D[k] = matrix[r][c];
-                k++;
-            }
-        }
-        // –í–≤–µ—Ä—Ö
-        for (int i = 0; i < step; i++) {
-            r = r - 1;
-            if (r >= 0 && r < size && c >= 0 && c < size) {
-                D[k] = matrix[r][c];
-                k++;
-            }
-        }
+        step++;
+
+        for (int i = 0; i < step && c < size * size; i++)
+            arr[c++] = matrix[r][--col];
+        for (int i = 0; i < step && c < size * size; i++)
+            arr[c++] = matrix[--r][col];
+
         step++;
     }
 }
