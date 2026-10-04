@@ -67,23 +67,23 @@ void draw_tree_top_down(sf::RenderWindow &window, vertex *p, float x, float y, f
 
 int main(int argc, char const *argv[]) {
     int *A = NULL;
+    int w = 0;
     int n = 20;
     A = (int *)malloc(n * sizeof(int));
     int size;
     int sum;
     int height;
     int slw;
-    int t;
     srand(time(0));
     fill_rand(A, 20);
     printf("\n");
-    printf("à·ÂÆ§≠Î© ¨†··®¢: ");
+    printf("–ò—Å—Ö–æ–¥–Ω—ã–π –º–∞—Å—Å–∏–≤: ");
     print_mas(A, 20);
     printf("\n");
     for (int i = 0; i < 20; i++) {
         SDP_recursion(A[i], root);
     }
-    printf("Æ°ÂÆ§ ·´•¢† ≠†Ø‡†¢Æ: \n");
+    printf("–æ–±—Ö–æ–¥ —Å–ª–µ–≤–∞ –Ω–∞–ø—Ä–∞–≤–æ: \n");
     obhod_left_to_right(root);
     printf("\n\n");
     sf::RenderWindow window(sf::VideoMode({1800, 750}), "Derevo");
@@ -98,12 +98,16 @@ int main(int argc, char const *argv[]) {
         }
         window.clear(sf::Color(219, 215, 210));
         if (root != NULL) {
-            draw_tree_top_down(window, root, 950.0f, 50.0f, 480.0f, font);
+            draw_tree_top_down(window, root, 700.0f, 50.0f, 350.0f, font);
         }
         window.display();
-        printf("Ç¢•§®‚• ¢•‡Ë®≠„, ™Æ‚Æ‡„Ó ≠•Æ°ÂÆ§®¨Æ „§†´®‚Ï\n");
-        scanf("%d", &t);
-        delete_SDP(t, root);
+        if (w < 10) {
+            int t;
+            printf("–í–≤–µ–¥–∏—Ç–µ –≤–µ—Ä—à–∏–Ω—É, –∫–æ—Ç–æ—Ä—É—é –Ω–µ–æ–±—Ö–æ–¥–∏–º–æ —É–¥–∞–ª–∏—Ç—å\n");
+            scanf("%d", &t);
+            delete_SDP(t, root);
+            w++;
+        }
     }
 
     return 0;
@@ -156,7 +160,7 @@ int sum_len_way(vertex *p, int l) {
 void fill_rand(int *A, int n) {
     srand(time(0));
     for (int i = 0; i < n; i++) {
-        A[i] = rand() % 80;
+        A[i] = rand() % 100;
     }
 }
 void print_mas(int *A, int n) {
