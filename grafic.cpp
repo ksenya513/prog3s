@@ -10,6 +10,7 @@ struct vertex {
     int data;
     vertex *left;
     vertex *right;
+    int balance;
 } *root;
 
 void print_mas(int *A, int n);
@@ -21,7 +22,13 @@ int sum_tree(vertex *p);
 int height_tree(vertex *p);
 int sum_len_way(vertex *p, int l);
 vertex *ISPD(int L, int R, int *A);
+void turn_RL(vertex *&p);
+void turn_LR(vertex *&p);
+void turn_RR(vertex *&p);
+void turn_LL(vertex *&p);
+void AVL_tree(int D, vertex *&root);
 void fill_rand(int *A, int n);
+bool rost;
 
 void draw_tree_top_down(sf::RenderWindow &window, vertex *p, float x, float y, float x_lenght, const sf::Font &font) {
     if (p == NULL)
@@ -71,10 +78,13 @@ int main(int argc, char const *argv[]) {
     A = (int *)malloc(n * sizeof(int));
     srand(time(0));
     fill_rand(A, 100);
+    print_mas(A, 100);
     for (int i = 0; i < 100; i++) {
-        SDP_double_cos(A[i], root);
+        AVL_tree(A[i], root);
     }
-    sf::RenderWindow window(sf::VideoMode({1800, 1000}), "Derevo");
+    printf("\n\n\n");
+    obhod_left_to_right(root);
+    sf::RenderWindow window(sf::VideoMode({1950, 1000}), "Derevo");
     window.setFramerateLimit(60);
     sf::Font font;
     font.openFromFile("C:\\Windows\\Fonts\\arial.ttf");
@@ -153,5 +163,105 @@ void SDP_double_cos(int D, vertex *&root) {
         (*p)->right = NULL;
     }
 }
+void turn_LL(vertex *&p) {
+    vertex *q = p->left;
+    p->balance = 0;
+    q->balance = 0;
+    p->left = q->right;
+    q->right = p;
+    p = q;
+}
+void turn_RR(vertex *&p) {
+    vertex *q = p->right;
+    p->balance = 0;
+    q->balance = 0;
+    p->right = q->left;
+    q->left = p;
+    p = q;
+}
+void turn_LR(vertex *&p) {
+    vertex *q = p->left;
+    vertex *r = q->right;
+    if (r->balance < 0)
+        p->balance = 1;
+    else
+        p->balance = 0;
 
+    if (r->balance > 0)
+        q->balance = -1;
+    else
+        q->balance = 0;
+
+    r->balance = 0;
+    q->right = r->left;
+    p->left = r->right;
+    r->left = q;
+    r->right = p;
+    p = r;
+}
+void turn_RL(vertex *&p) {
+    vertex *q = p->right;
+    vertex *r = q->left;
+    if (r->balance > 0)
+        p->balance = -1;
+    else
+        p->balance = 0;
+
+    if (r->balance < 0)
+        q->balance = 1;
+    else
+        q->balance = 0;
+
+    r->balance = 0;
+    q->left = r->right;
+    p->right = r->left;
+    r->left = p;
+    r->right = q;
+    p = r;
+}
+void AVL_tree(int D, vertex *&p) {
+    if (p == NULL) {
+        p = new vertex;
+        p->data = D;
+        p->left = p->right = NULL;
+        p->balance = 0;
+        rost = true;
+    } else if (p->data > D) {
+        AVL_tree(D, p->left);
+        if (rost == true) { // выросав левая ветвь
+            if (p->balance > 0) {
+                p->balance = 0;
+                rost = false;
+            } else if (p->balance == 0) {
+                p->balance = -1;
+                rost = true;
+            } else if (p->left->balance < 0) {
+                turn_LL(p);
+                rost = false;
+            } else {
+                turn_LR(p);
+                rost = false;
+            }
+        }
+    } else if (p->data < D) {
+        AVL_tree(D, p->right);
+        if (rost == true) { // выросла правая ветвь
+            if (p->balance < 0) {
+                p->balance = 0;
+                rost = false;
+            } else if (p->balance == 0) {
+                p->balance = 1;
+                rost = true;
+            } else if (p->right->balance > 0) {
+                turn_RR(p);
+                rost = false;
+            } else {
+                turn_RL(p);
+                rost = false;
+            }
+        }
+    } else {
+        rost = false;
+    }
+}
 // g++ grafic.cpp -lsfml-graphics -lsfml-window -lsfml-system -o fzar.exe

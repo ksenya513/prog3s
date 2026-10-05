@@ -9,32 +9,32 @@ struct vertex {
     int data;
     vertex *left;
     vertex *right;
-} *root, *root1, *root2;
-int duplicate[3] = {0, 0, 0};
-
-enum tree { ISDP, SDP1, SDP2 };
+    int balance;
+} *root;
 
 void print_mas(int *A, int n);
-void bubble_sort(int *A, int n);
 void obhod_left_to_right(vertex *p);
 int size_tree(vertex *p);
 int sum_tree(vertex *p);
 int height_tree(vertex *p);
 int sum_len_way(vertex *p, int l);
-vertex *ISPD(int L, int R, int *A);
-void SDP_double_cos(int D, vertex *&root);
-void SDP_recursion(int D, vertex *&p);
 void fill_rand(int *A, int n);
-char *get_tree_name(int t);
+void turn_RL(vertex *&p);
+void turn_LR(vertex *&p);
+void turn_RR(vertex *&p);
+void turn_LL(vertex *&p);
+void AVL_tree(int D, vertex *&root);
+
+bool rost;
 
 int main(int argc, char const *argv[]) {
     int *A = NULL;
     int n = 100;
     A = (int *)malloc(n * sizeof(int));
-    int size[3];
-    int sum[3];
-    int height[3];
-    int slw[3];
+    int size;
+    int sum;
+    int height;
+    int slw;
     srand(time(0));
     fill_rand(A, 100);
     printf("\n");
@@ -42,39 +42,16 @@ int main(int argc, char const *argv[]) {
     print_mas(A, 100);
     printf("\n");
     for (int i = 0; i < 100; i++) {
-        SDP_double_cos(A[i], root1);
-        SDP_recursion(A[i], root2);
+        AVL_tree(A[i], root);
     }
     printf("Обход слеав направо: \n");
-    printf("ИСПД: ");
-    bubble_sort(A, 100);
-    root = ISPD(0, 99, A);
     obhod_left_to_right(root);
-    printf("\n\nСДП1: ");
-    obhod_left_to_right(root1);
-    printf("\n\nСДП2: ");
-    obhod_left_to_right(root2);
-    printf("\n\n");
-    size[0] = size_tree(root);
-    sum[0] = sum_tree(root);
-    height[0] = height_tree(root);
-    slw[0] = sum_len_way(root, 1);
-    size[1] = size_tree(root1);
-    sum[1] = sum_tree(root1);
-    height[1] = height_tree(root1);
-    slw[1] = sum_len_way(root1, 1);
-    size[2] = size_tree(root2);
-    sum[2] = sum_tree(root2);
-    height[2] = height_tree(root2);
-    slw[2] = sum_len_way(root2, 1);
-    printf("|  n=100  | Размер  |  Сумма  |  Высота |Ср.высота|Повтор значения|\n");
-    for (int i = 0; i < 3; i++) {
-        printf("|%9s|%9d|%9d|%9d|%9.2f|", get_tree_name(i), size[i], sum[i], height[i], slw[i] / (float)size[i]);
-        if (duplicate[i] == 0)
-            printf("       -       |\n");
-        else
-            printf("%15d|\n", duplicate[i]);
-    }
+    size = size_tree(root);
+    sum = sum_tree(root);
+    height = height_tree(root);
+    slw = sum_len_way(root, 1);
+    printf("\n| Размер  |  Сумма  |  Высота |Ср.высота|\n");
+    printf("|%9d|%9d|%9d|%9.2f|", size, sum, height, slw / (float)size);
     return 0;
 }
 void obhod_left_to_right(vertex *p) {
@@ -122,18 +99,6 @@ int sum_len_way(vertex *p, int l) {
     return s;
 }
 
-vertex *ISPD(int L, int R, int *A) {
-    if (L > R)
-        return NULL;
-    else {
-        int m = ceil((L + R) / 2);
-        vertex *p = (vertex *)malloc(sizeof(vertex));
-        p->data = A[m];
-        p->left = ISPD(L, m - 1, A);
-        p->right = ISPD(m + 1, R, A);
-        return p;
-    }
-}
 void fill_rand(int *A, int n) {
     srand(time(0));
     for (int i = 0; i < n; i++) {
@@ -146,58 +111,104 @@ void print_mas(int *A, int n) {
     }
     printf("\n");
 }
-void bubble_sort(int *A, int n) {
-    for (int i = 0; i < n; i++) {
-        for (int j = n - 1; j > i; j--) {
-            if (A[j] < A[j - 1]) {
-                int temp = A[j];
-                A[j] = A[j - 1];
-                A[j - 1] = temp;
+void turn_LL(vertex *&p) {
+    vertex *q = p->left;
+    p->balance = 0;
+    q->balance = 0;
+    p->left = q->right;
+    q->right = p;
+    p = q;
+}
+void turn_RR(vertex *&p) {
+    vertex *q = p->right;
+    p->balance = 0;
+    q->balance = 0;
+    p->right = q->left;
+    q->left = p;
+    p = q;
+}
+void turn_LR(vertex *&p) {
+    vertex *q = p->left;
+    vertex *r = q->right;
+    if (r->balance < 0)
+        p->balance = 1;
+    else
+        p->balance = 0;
+
+    if (r->balance > 0)
+        q->balance = -1;
+    else
+        q->balance = 0;
+
+    r->balance = 0;
+    q->right = r->left;
+    p->left = r->right;
+    r->left = q;
+    r->right = p;
+    p = r;
+}
+void turn_RL(vertex *&p) {
+    vertex *q = p->right;
+    vertex *r = q->left;
+    if (r->balance > 0)
+        p->balance = -1;
+    else
+        p->balance = 0;
+
+    if (r->balance < 0)
+        q->balance = 1;
+    else
+        q->balance = 0;
+
+    r->balance = 0;
+    q->left = r->right;
+    p->right = r->left;
+    r->left = p;
+    r->right = q;
+    p = r;
+}
+void AVL_tree(int D, vertex *&p) {
+    if (p == NULL) {
+        p = new vertex;
+        p->data = D;
+        p->left = p->right = NULL;
+        p->balance = 0;
+        rost = true;
+    } else if (p->data > D) {
+        AVL_tree(D, p->left);
+        if (rost == true) { // выросав левая ветвь
+            if (p->balance > 0) {
+                p->balance = 0;
+                rost = false;
+            } else if (p->balance == 0) {
+                p->balance = -1;
+                rost = true;
+            } else if (p->left->balance < 0) {
+                turn_LL(p);
+                rost = false;
+            } else {
+                turn_LR(p);
+                rost = false;
             }
         }
-    }
-}
-char *get_tree_name(int t) {
-    switch (t) {
-        case 0:
-            return "ISDP";
-        case 1:
-            return "SDP1";
-        case 2:
-            return "SDP2";
-    }
-}
-void SDP_double_cos(int D, vertex *&root) {
-    vertex **p = &root;
-    while (*p != NULL) {
-        if (D < (*p)->data)
-            p = &((*p)->left);
-        else if (D > (*p)->data)
-            p = &((*p)->right);
-        else {
-            duplicate[1] += 1;
-            break;
+    } else if (p->data < D) {
+        AVL_tree(D, p->right);
+        if (rost == true) { // выросла правая ветвь
+            if (p->balance < 0) {
+                p->balance = 0;
+                rost = false;
+            } else if (p->balance == 0) {
+                p->balance = 1;
+                rost = true;
+            } else if (p->right->balance > 0) {
+                turn_RR(p);
+                rost = false;
+            } else {
+                turn_RL(p);
+                rost = false;
+            }
         }
-    }
-    if (*p == NULL) {
-        *p = new vertex;
-        (*p)->data = D;
-        (*p)->left = NULL;
-        (*p)->right = NULL;
-    }
-}
-void SDP_recursion(int D, vertex *&p) {
-    if (p == NULL) {
-        p = new (vertex);
-        p->data = D;
-        p->left = NULL;
-        p->right = NULL;
-    } else if (D < p->data)
-        SDP_recursion(D, p->left);
-    else if (D > p->data)
-        SDP_recursion(D, p->right);
-    else {
-        duplicate[2] += 1;
-        return;
+    } else {
+        rost = false;
     }
 }
