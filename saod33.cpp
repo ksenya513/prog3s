@@ -10,7 +10,7 @@ struct vertex {
     vertex *left;
     vertex *right;
     int balance;
-} *root;
+} *root, *root2;
 
 void print_mas(int *A, int n);
 void obhod_left_to_right(vertex *p);
@@ -19,6 +19,8 @@ int sum_tree(vertex *p);
 int height_tree(vertex *p);
 int sum_len_way(vertex *p, int l);
 void fill_rand(int *A, int n);
+vertex *ISPD(int L, int R, int *A);
+void bubble_sort(int *A, int n);
 void turn_RL(vertex *&p);
 void turn_LR(vertex *&p);
 void turn_RR(vertex *&p);
@@ -35,6 +37,10 @@ int main(int argc, char const *argv[]) {
     int sum;
     int height;
     int slw;
+    int size2;
+    int sum2;
+    int height2;
+    int slw2;
     srand(time(0));
     fill_rand(A, 100);
     printf("\n");
@@ -44,14 +50,21 @@ int main(int argc, char const *argv[]) {
     for (int i = 0; i < 100; i++) {
         AVL_tree(A[i], root);
     }
+    bubble_sort(A, 100);
+    root2 = ISPD(0, 99, A);
     printf("Обход слеав направо: \n");
     obhod_left_to_right(root);
     size = size_tree(root);
     sum = sum_tree(root);
     height = height_tree(root);
     slw = sum_len_way(root, 1);
+    size2 = size_tree(root2);
+    sum2 = sum_tree(root2);
+    height2 = height_tree(root2);
+    slw2 = sum_len_way(root2, 1);
     printf("\n| Размер  |  Сумма  |  Высота |Ср.высота|\n");
-    printf("|%9d|%9d|%9d|%9.2f|", size, sum, height, slw / (float)size);
+    printf("|%9d|%9d|%9d|%9.2f|\n", size, sum, height, slw / (float)size);
+    printf("|%9d|%9d|%9d|%9.2f|", size2, sum2, height2, slw2 / (float)size2);
     return 0;
 }
 void obhod_left_to_right(vertex *p) {
@@ -102,7 +115,7 @@ int sum_len_way(vertex *p, int l) {
 void fill_rand(int *A, int n) {
     srand(time(0));
     for (int i = 0; i < n; i++) {
-        A[i] = rand() % (80 * n + 1);
+        A[i] = rand() % 10000;
     }
 }
 void print_mas(int *A, int n) {
@@ -210,5 +223,28 @@ void AVL_tree(int D, vertex *&p) {
         }
     } else {
         rost = false;
+    }
+}
+vertex *ISPD(int L, int R, int *A) {
+    if (L > R)
+        return NULL;
+    else {
+        int m = ceil((L + R) / 2);
+        vertex *p = (vertex *)malloc(sizeof(vertex));
+        p->data = A[m];
+        p->left = ISPD(L, m - 1, A);
+        p->right = ISPD(m + 1, R, A);
+        return p;
+    }
+}
+void bubble_sort(int *A, int n) {
+    for (int i = 0; i < n; i++) {
+        for (int j = n - 1; j > i; j--) {
+            if (A[j] < A[j - 1]) {
+                int temp = A[j];
+                A[j] = A[j - 1];
+                A[j - 1] = temp;
+            }
+        }
     }
 }
