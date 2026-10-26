@@ -68,7 +68,7 @@ void draw_tree_top_down(sf::RenderWindow &window, vertex *p, float x, float y, f
 int main(int argc, char const *argv[]) {
     int *A = NULL;
     int w = 0;
-    int n = 20;
+    int n = 12;
     A = (int *)malloc(n * sizeof(int));
     int size;
     int sum;
