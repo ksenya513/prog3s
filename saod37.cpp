@@ -22,6 +22,7 @@ void obhod_left_to_right(vertex *p);
 int size_tree(vertex *p);
 int sum_tree(vertex *p);
 int height_tree(vertex *p);
+int height_tree_2(vertex *p);
 int sum_len_way(vertex *p, int l);
 void fill_rand(int *A, int n);
 void dbd_tree(int D, vertex *&p);
@@ -35,27 +36,14 @@ void draw_dbd_tree(sf::RenderWindow &window, vertex *p, float x, float y, float 
     if (p == NULL)
         return;
 
-    float y_step = 60.0f;
+    float y_step = 100.0f;
     float radius = 15.0f;
+    float target_y;
+    sf::Color line_color = sf::Color(255, 150, 0);
 
     if (p->left != NULL) {
-        bool horizontal = (p->left->balance == 1);
-
-        float target_y;
-        if (horizontal) {
-            target_y = y;
-        } else {
-            target_y = y + y_step;
-        }
-
+        float target_y = y + y_step;
         float target_x = x - x_lenght;
-
-        sf::Color line_color;
-        if (horizontal) {
-            line_color = sf::Color(150, 170, 100);
-        } else {
-            line_color = sf::Color(255, 150, 0);
-        }
 
         sf::Vertex line[] = {sf::Vertex(sf::Vector2f(x, y), line_color), sf::Vertex(sf::Vector2f(target_x, target_y), line_color)};
         window.draw(line, 2, sf::PrimitiveType::Lines);
@@ -70,22 +58,15 @@ void draw_dbd_tree(sf::RenderWindow &window, vertex *p, float x, float y, float 
     }
 
     if (p->right != NULL) {
-        bool horizontal = (p->right->balance == 1);
-
-        float target_y;
+        bool horizontal = (p->balance == 1 && p->right->balance == 0);
         if (horizontal) {
             target_y = y;
         } else {
-            target_y = y + y_step;
+            target_y = (y + y_step);
         }
-
         float target_x = x + x_lenght;
-
-        sf::Color line_color;
         if (horizontal) {
-            line_color = sf::Color(50, 170, 100);
-        } else {
-            line_color = sf::Color(255, 150, 0);
+            line_color = sf::Color(50, 205, 50);
         }
 
         sf::Vertex line[] = {sf::Vertex(sf::Vector2f(x, y), line_color), sf::Vertex(sf::Vector2f(target_x, target_y), line_color)};
@@ -93,6 +74,7 @@ void draw_dbd_tree(sf::RenderWindow &window, vertex *p, float x, float y, float 
 
         draw_dbd_tree(window, p->right, target_x, target_y, x_lenght / 2, font);
     } else {
+
         sf::Vertex line[] = {sf::Vertex(sf::Vector2f(x, y), sf::Color(255, 150, 0)),
                              sf::Vertex(sf::Vector2f(x + x_lenght, y + y_step), sf::Color(255, 150, 0)),
                              sf::Vertex(sf::Vector2f(x + x_lenght - 5, y + y_step), sf::Color(255, 150, 0)),
@@ -167,10 +149,11 @@ int main(int argc, char const *argv[]) {
         }
         window.clear(sf::Color(219, 215, 210));
         if (root3 != NULL) {
-            draw_dbd_tree(window, root3, 2600.0f, 20.0f, 1350.0f, font);
+            draw_dbd_tree(window, root3, 2600.0f, 100.0f, 1450.0f, font);
         }
         window.display();
     }
+
     return 0;
 }
 
@@ -191,6 +174,7 @@ int size_tree(vertex *p) {
     }
     return n;
 }
+
 int sum_tree(vertex *p) {
     int s;
     if (p == NULL) {
@@ -206,6 +190,15 @@ int height_tree(vertex *p) {
         h = 0;
     } else {
         h = 1 + std::max(height_tree(p->left), height_tree(p->right));
+    }
+    return h;
+}
+int height_tree_2(vertex *p) {
+    int h;
+    if (p == NULL) {
+        h = 0;
+    } else {
+        h = 1 + height_tree_2(p->left);
     }
     return h;
 }
